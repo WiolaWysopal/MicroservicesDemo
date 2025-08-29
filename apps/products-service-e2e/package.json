@@ -1,0 +1,26 @@
+{
+  "name": "@microservices-demo/products-service-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@microservices-demo/products-service"
+    ],
+    "targets": {
+      "e2e": {
+        "executor": "@nx/jest:jest",
+        "outputs": [
+          "{projectRoot}/test-output/jest/coverage"
+        ],
+        "options": {
+          "jestConfig": "apps/products-service-e2e/jest.config.ts",
+          "passWithNoTests": true
+        },
+        "dependsOn": [
+          "@microservices-demo/products-service:build",
+          "@microservices-demo/products-service:serve"
+        ]
+      }
+    }
+  }
+}
