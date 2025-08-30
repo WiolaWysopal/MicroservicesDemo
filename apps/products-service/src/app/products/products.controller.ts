@@ -1,5 +1,5 @@
 // products/products.controller.ts
-import { Controller, Get, Post, Put, Param, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Put, Param, Body, HttpCode, HttpStatus, Patch } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Product } from './product.entity';
 
@@ -42,5 +42,14 @@ export class ProductsController {
       parseInt(quantity)
     );
     return { available };
+  }
+
+  // Endpoint do sprawdzenia zmiejszania ilości na magazynie
+  @Patch(':id/decrease')
+  decreaseQuantity(
+  @Param('id') id: string,
+  @Body() body: {quantity: number}
+  ) {
+    return this.productsService.decreaseQuantity(parseInt(id), body.quantity); 
   }
 }
