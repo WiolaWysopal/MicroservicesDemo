@@ -10,10 +10,10 @@
       "path": "./apps/products-service"
     },
     {
-      "path": "./orders-service-e2e"
+      "path": "./apps/orders-service-e2e"
     },
     {
-      "path": "./orders-service"
+      "path": "./apps/orders-service"
     }
   ],
   "compilerOptions": {
