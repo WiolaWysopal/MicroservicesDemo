@@ -65,7 +65,7 @@
         "options": {
           "buildTarget": "@microservices-demo/orders-service:build",
           "runBuildTargetDependencies": false,
-          "port": 3002
+          "port": 3102
         },
         "configurations": {
           "development": {
