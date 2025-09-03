@@ -46,6 +46,7 @@
   "workspaces": [
     "apps/*",
     "orders-service",
-    "orders-service-e2e"
+    "orders-service-e2e",
+    "shared-interfaces"
   ]
 }

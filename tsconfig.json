@@ -14,6 +14,9 @@
     },
     {
       "path": "./apps/orders-service"
+    },
+    {
+      "path": "./shared-interfaces"
     }
   ],
   "compilerOptions": {
