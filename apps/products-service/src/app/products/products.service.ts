@@ -1,20 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Product } from './product.entity';
+import { IProduct } from '@microservices-demo/shared-interfaces';
 
 @Injectable()
 export class ProductsService {
   // Symulacja bazy danych - w prawdziwym projekcie użyj TypeORM/Prisma
-  private products: Product[] = [
+  private products: IProduct[] = [
     { id: 1, name: 'Laptop', price: 2500, quantity: 10, description: 'Gaming laptop' },
     { id: 2, name: 'Mouse', price: 50, quantity: 100, description: 'Wireless mouse' },
   ];
   private idCounter = 3;
 
-  findAll(): Product[] {
+  findAll(): IProduct[] {
     return this.products;
   }
 
-  findOne(id: number): Product {
+  findOne(id: number): IProduct {
     const product = this.products.find(p => p.id === id);
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
@@ -22,8 +22,8 @@ export class ProductsService {
     return product;
   }
 
-  create(productData: Partial<Product>): Product {
-    const newProduct: Product = {
+  create(productData: Partial<IProduct>): IProduct {
+    const newProduct: IProduct = {
       id: this.idCounter++,
       name: productData.name || '',
       price: productData.price || 0,
@@ -34,7 +34,7 @@ export class ProductsService {
     return newProduct;
   }
 
-  update(id: number, productData: Partial<Product>): Product {
+  update(id: number, productData: Partial<IProduct>): IProduct {
     const index = this.products.findIndex(p => p.id === id);
     if (index === -1) {
       throw new NotFoundException(`Product with ID ${id} not found`);

@@ -20,5 +20,10 @@
     "jest.config.ts",
     "src/**/*.spec.ts",
     "src/**/*.test.ts"
+  ],
+  "references": [
+    {
+      "path": "../../shared-interfaces/tsconfig.lib.json"
+    }
   ]
 }
