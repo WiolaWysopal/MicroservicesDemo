@@ -1,0 +1,199 @@
+{
+	"info": {
+		"_postman_id": "2802b448-9e18-42e5-84de-11d9362501eb",
+		"name": "ProductsService",
+		"description": "# 🚀 Get started here\n\nThis template guides you through CRUD operations (GET, POST, PUT, DELETE), variables, and tests.\n\n## 🔖 **How to use this template**\n\n#### **Step 1: Send requests**\n\nRESTful APIs allow you to perform CRUD operations using the POST, GET, PUT, and DELETE HTTP methods.\n\nThis collection contains each of these [request](https://learning.postman.com/docs/sending-requests/requests/) types. Open each request and click \"Send\" to see what happens.\n\n#### **Step 2: View responses**\n\nObserve the response tab for status code (200 OK), response time, and size.\n\n#### **Step 3: Send new Body data**\n\nUpdate or add new data in \"Body\" in the POST request. Typically, Body data is also used in PUT request.\n\n```\n{\n    \"name\": \"Add your name in the body\"\n}\n\n ```\n\n#### **Step 4: Update the variable**\n\nVariables enable you to store and reuse values in Postman. We have created a [variable](https://learning.postman.com/docs/sending-requests/variables/) called `base_url` with the sample request [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me). Replace it with your API endpoint to customize this collection.\n\n#### **Step 5: Add tests in the \"Scripts\" tab**\n\nAdding tests to your requests can help you confirm that your API is working as expected. You can write test scripts in JavaScript and view the output in the \"Test Results\" tab.\n\n<img src=\"https://content.pstmn.io/fa30ea0a-373d-4545-a668-e7b283cca343/aW1hZ2UucG5n\" alt=\"\" height=\"1530\" width=\"2162\">\n\n## 💪 Pro tips\n\n- Use folders to group related requests and organize the collection.\n    \n- Add more [scripts](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/) to verify if the API works as expected and execute workflows.\n    \n\n## 💡Related templates\n\n[API testing basics](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9a37a28-055b-49cd-8c7e-97494a21eb54&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[API documentation](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9c28f47-1253-44af-a2f3-20dce4da1f18&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[Authorization methods](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=31a9a6ed-4cdf-4ced-984c-d12c9aec1c27&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38063892",
+		"_collection_link": "https://lonelymaster-7213.postman.co/workspace/WiolaWysopal~6f203b46-93b8-4a47-8516-9fbc75705bc1/collection/38063892-2802b448-9e18-42e5-84de-11d9362501eb?action=share&source=collection_link&creator=38063892"
+	},
+	"item": [
+		{
+			"name": "localhost",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000",
+					"host": [
+						"localhost"
+					],
+					"port": "3000"
+				},
+				"description": "After hitting localhost:3000 an error occured; there's no general endpoint on localhost:3000"
+			},
+			"response": []
+		},
+		{
+			"name": "findAll()",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{PRODUCTS_SERVICE}}/products",
+					"host": [
+						"{{PRODUCTS_SERVICE}}"
+					],
+					"path": [
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "findOne()",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{PRODUCTS_SERVICE}}/products/1",
+					"host": [
+						"{{PRODUCTS_SERVICE}}"
+					],
+					"path": [
+						"products",
+						"1"
+					]
+				},
+				"description": "To test endpoint set 1 or 2 as a parametrer: localhost:3000/api/products/1 or localhost:3000/api/products/2; another value refers an error"
+			},
+			"response": []
+		},
+		{
+			"name": "create()",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"name\": \"Monitor\", \"price\": 50.50, \"quantity\": 10 }\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{PRODUCTS_SERVICE}}/products",
+					"host": [
+						"{{PRODUCTS_SERVICE}}"
+					],
+					"path": [
+						"products"
+					]
+				},
+				"description": "To test endpoint go to Body > raw section and add some new product"
+			},
+			"response": []
+		},
+		{
+			"name": "update()",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"name\": \"Monitor 4K\", \"quantity\": 7 }\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{PRODUCTS_SERVICE}}/products/5",
+					"host": [
+						"{{PRODUCTS_SERVICE}}"
+					],
+					"path": [
+						"products",
+						"5"
+					]
+				},
+				"description": "Updates data in the database depending on the given id and new parameters. Example:\n\nFor [http://localhost:3000/api/products/5](http://localhost:3000/api/products/5) gives:\n\n{  \n\"id\": 5,  \n\"name\": \"Monitor 4K\",  \n\"price\": 50.5,  \n\"quantity\": 7  \n}"
+			},
+			"response": []
+		},
+		{
+			"name": "checkAvailability()",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{PRODUCTS_SERVICE}}/products/1/availability/11",
+					"host": [
+						"{{PRODUCTS_SERVICE}}"
+					],
+					"path": [
+						"products",
+						"1",
+						"availability",
+						"11"
+					]
+				},
+				"description": "For [StartFragmenthttp://localhost:3000/api/products/[id]/availability/[amount]](https://StartFragmenthttp://localhost:3000/api/products/[id]/availability/[amount])  \nchecks is this quantity is available in strone; BOOLEAN - returns true or false. Example:\n\nFor\n\nhttp://localhost:3000/api/products/1/availability/11\n\nreturns\n\n{ \"available\": false}"
+			},
+			"response": []
+		},
+		{
+			"name": "decreaseQuantity()",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"quantity\": 1 }\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{PRODUCTS_SERVICE}}/products/2/decrease",
+					"host": [
+						"{{PRODUCTS_SERVICE}}"
+					],
+					"path": [
+						"products",
+						"2",
+						"decrease"
+					]
+				},
+				"description": "Reduces the quantity of available goods by the specified number in Body"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": "1"
+		},
+		{
+			"key": "base_url",
+			"value": "https://template.postman-echo.com"
+		}
+	]
+}
