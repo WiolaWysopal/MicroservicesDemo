@@ -2,7 +2,6 @@ import { OrdersService } from './orders.service';
 import { BadRequestException } from '@nestjs/common';
 
 // Klasa Mockowa
-
 class ProductsClientServiceMock {
   async getProduct(productId: string) {
     return { id: productId, name: `Product ${productId}`, price: 10 };
