@@ -1,60 +1,80 @@
+// apps/products-service/src/app/products/products.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { IProduct } from '@microservices-demo/shared-interfaces';
+import { PrismaService } from '../prisma/prisma.service';
+import { Product, Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductsService {
-  // Symulacja bazy danych - w prawdziwym projekcie użyj TypeORM/Prisma
-  private products: IProduct[] = [
-    { id: 1, name: 'Laptop', price: 2500, quantity: 10, description: 'Gaming laptop' },
-    { id: 2, name: 'Mouse', price: 50, quantity: 100, description: 'Wireless mouse' },
-  ];
-  private idCounter = 3;
+  constructor(private prisma: PrismaService) {}
 
-  findAll(): IProduct[] {
-    return this.products;
+  async findAll(): Promise<Product[]> {
+    return this.prisma.product.findMany();
   }
 
-  findOne(id: number): IProduct {
-    const product = this.products.find(p => p.id === id);
+  async findOne(id: number): Promise<Product> {
+    const product = await this.prisma.product.findUnique({
+      where: { id },
+    });
+    
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
+    
     return product;
   }
 
-  create(productData: Partial<IProduct>): IProduct {
-    const newProduct: IProduct = {
-      id: this.idCounter++,
-      name: productData.name || '',
-      price: productData.price || 0,
-      quantity: productData.quantity || 0,
-      description: productData.description,
-    };
-    this.products.push(newProduct);
-    return newProduct;
+  async create(data: Prisma.ProductCreateInput): Promise<Product> {
+    return this.prisma.product.create({
+      data,
+    });
   }
 
-  update(id: number, productData: Partial<IProduct>): IProduct {
-    const index = this.products.findIndex(p => p.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`Product with ID ${id} not found`);
+  async update(id: number, data: Prisma.ProductUpdateInput): Promise<Product> {
+    try {
+      return await this.prisma.product.update({
+        where: { id },
+        data,
+      });
+    } catch (error) {
+      if (error.code === 'P2025') {
+        throw new NotFoundException(`Product with ID ${id} not found`);
+      }
+      throw error;
     }
-    this.products[index] = { ...this.products[index], ...productData };
-    return this.products[index];
   }
 
-  // Metoda pomocnicza dla Orders Service
-  checkAvailability(id: number, requestedQuantity: number): boolean {
-    const product = this.findOne(id);
+  async delete(id: number): Promise<Product> {
+    try {
+      return await this.prisma.product.delete({
+        where: { id },
+      });
+    } catch (error) {
+      if (error.code === 'P2025') {
+        throw new NotFoundException(`Product with ID ${id} not found`);
+      }
+      throw error;
+    }
+  }
+
+  async checkAvailability(id: number, requestedQuantity: number): Promise<boolean> {
+    const product = await this.findOne(id);
     return product.quantity >= requestedQuantity;
   }
 
-  // Metoda do zmniejszania stanu magazynowego
-  decreaseQuantity(id: number, quantity: number): void {
-    const product = this.findOne(id);
+  async decreaseQuantity(id: number, quantity: number): Promise<Product> {
+    const product = await this.findOne(id);
+    
     if (product.quantity < quantity) {
       throw new Error('Insufficient quantity');
     }
-    product.quantity -= quantity;
+    
+    return this.prisma.product.update({
+      where: { id },
+      data: {
+        quantity: {
+          decrement: quantity,
+        },
+      },
+    });
   }
 }
