@@ -17,6 +17,7 @@
   "devDependencies": {
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.0",
+    "@nrwl/nest": "^19.8.4",
     "@nx/jest": "21.4.1",
     "@nx/js": "21.4.1",
     "@nx/nest": "21.4.1",
@@ -43,6 +44,7 @@
   "workspaces": [
     "apps/*",
     "orders-service",
-    "orders-service-e2e"
+    "orders-service-e2e",
+    "shared"
   ]
 }

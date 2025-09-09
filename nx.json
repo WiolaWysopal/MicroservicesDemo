@@ -29,7 +29,10 @@
           "buildDepsName": "build-deps",
           "watchDepsName": "watch-deps"
         }
-      }
+      },
+      "exclude": [
+        "shared/*"
+      ]
     },
     {
       "plugin": "@nx/webpack/plugin",
@@ -51,6 +54,17 @@
         "apps/products-service-e2e/**/*",
         "orders-service-e2e/**/*"
       ]
+    },
+    {
+      "plugin": "@nx/js/typescript",
+      "include": [
+        "shared/*"
+      ],
+      "options": {
+        "typecheck": {
+          "targetName": "typecheck"
+        }
+      }
     }
   ],
   "targetDefaults": {
