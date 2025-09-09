@@ -2,7 +2,9 @@
   "name": "@microservices-demo/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {"test": "jest"},
+  "scripts": {
+    "test": "jest"
+  },
   "private": true,
   "dependencies": {
     "@nestjs/common": "^11.0.0",
@@ -41,6 +43,8 @@
   },
   "workspaces": [
     "apps/*",
+    "orders-service",
+    "orders-service-e2e",
     "shared"
   ]
 }

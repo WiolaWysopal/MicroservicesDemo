@@ -51,7 +51,8 @@
         "targetName": "test"
       },
       "exclude": [
-        "apps/products-service-e2e/**/*"
+        "apps/products-service-e2e/**/*",
+        "orders-service-e2e/**/*"
       ]
     },
     {

@@ -1,0 +1,26 @@
+{
+  "name": "@microservices-demo/orders-service-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@microservices-demo/orders-service"
+    ],
+    "targets": {
+      "e2e": {
+        "executor": "@nx/jest:jest",
+        "outputs": [
+          "{projectRoot}/test-output/jest/coverage"
+        ],
+        "options": {
+          "jestConfig": "orders-service-e2e/jest.config.ts",
+          "passWithNoTests": true
+        },
+        "dependsOn": [
+          "@microservices-demo/orders-service:build",
+          "@microservices-demo/orders-service:serve"
+        ]
+      }
+    }
+  }
+}
