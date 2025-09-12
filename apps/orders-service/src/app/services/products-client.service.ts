@@ -5,6 +5,10 @@ import { AxiosError } from 'axios';
 
 @Injectable()
 export class ProductsClientService {
+  // implementacja tej metody to kolejne zadanie
+  decreaseQuantity(productId: number, quantity: number) {
+    throw new Error('Method not implemented.');
+  }
   private readonly productsServiceUrl = 'http://localhost:3000/api';
 
   constructor(private readonly httpService: HttpService) {}

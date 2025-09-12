@@ -1,17 +1,19 @@
+// apps/orders-service/src/app/orders/orders.service.ts
 import { Injectable, BadRequestException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { Order, OrderItem, Prisma } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ProductsClientService } from '../services/products-client.service';
-import { IOrder, IOrderItem } from '@microservices-demo/shared-interfaces';
 
 @Injectable()
 export class OrdersService {
-  private orders: IOrder[] = [];
-  private idCounter = 1;
+  constructor(
+    private prisma: PrismaService,
+    private readonly productsClient: ProductsClientService
+  ) {}
 
-  constructor(private readonly productsClient: ProductsClientService) {}
-
-  async create(createOrderDto: CreateOrderDto): Promise<IOrder> {
-    const orderItems: IOrderItem[] = [];
+  async create(createOrderDto: CreateOrderDto): Promise<Order> {
+    const orderItems: Prisma.OrderItemCreateWithoutOrderInput[] = [];
     let totalAmount = 0;
 
     // Walidacja i pobranie informacji o produktach
@@ -42,35 +44,82 @@ export class OrdersService {
       totalAmount += product.price * item.quantity;
     }
 
-    // Utwórz zamówienie
-    const newOrder: IOrder = {
-      id: this.idCounter++,
-      customerName: createOrderDto.customerName,
-      items: orderItems,
-      totalAmount,
-      status: 'confirmed',
-      createdAt: new Date(),
-    };
+    // Utwórz zamówienie w bazie danych
+    const order = await this.prisma.order.create({
+      data: {
+        customerName: createOrderDto.customerName,
+        totalAmount,
+        status: 'confirmed',
+        items: {
+          create: orderItems,
+        },
+      },
+      include: {
+        items: true,
+      },
+    });
 
-    this.orders.push(newOrder);
-    return newOrder;
+    // Zmniejsz stan magazynowy produktów
+    for (const item of createOrderDto.items) {
+       await this.productsClient.decreaseQuantity(item.productId, item.quantity);
+     }
+
+    return order;
   }
 
-  findAll(): IOrder[] {
-    return this.orders;
+  async findAll(): Promise<Order[]> {
+    return this.prisma.order.findMany({
+      include: {
+        items: true,
+      },
+    });
   }
 
-  findOne(id: number): IOrder {
-    const order = this.orders.find(o => o.id === id);
+  async findOne(id: number): Promise<Order> {
+    const order = await this.prisma.order.findUnique({
+      where: { id },
+      include: {
+        items: true,
+      },
+    });
+
     if (!order) {
       throw new BadRequestException(`Order with ID ${id} not found`);
     }
+
     return order;
   }
 
-  updateStatus(id: number, status: IOrder['status']): IOrder {
-    const order = this.findOne(id);
-    order.status = status;
-    return order;
+  async updateStatus(id: number, status: string): Promise<Order> {
+    try {
+      return await this.prisma.order.update({
+        where: { id },
+        data: { status },
+        include: {
+          items: true,
+        },
+      });
+    } catch (error: any) {
+      if (error.code === 'P2025') {
+        throw new BadRequestException(`Order with ID ${id} not found`);
+      }
+      throw error;
+    }
+  }
+
+  async delete(id: number): Promise<Order> {
+    try {
+      return await this.prisma.order.delete({
+        where: { id },
+        include: {
+          items: true,
+        },
+      });
+    } catch (error: any) {
+      if (error.code === 'P2025') {
+        throw new BadRequestException(`Order with ID ${id} not found`);
+      }
+      throw error;
+    }
   }
 }
