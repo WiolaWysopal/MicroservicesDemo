@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Patch, Param, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body, HttpCode, HttpStatus, ParseIntPipe } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { Order } from './order.entity';
 
 @Controller('orders')
@@ -19,15 +20,15 @@ export class OrdersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Order {
-    return this.ordersService.findOne(parseInt(id));
+  findOne(@Param('id', ParseIntPipe) id: number): Order {
+    return this.ordersService.findOne(id);
   }
 
   @Patch(':id/status')
   updateStatus(
-    @Param('id') id: string,
-    @Body('status') status: Order['status']
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateOrderStatusDto
   ): Order {
-    return this.ordersService.updateStatus(parseInt(id), status);
+    return this.ordersService.updateStatus(id, dto.status);
   }
 }
