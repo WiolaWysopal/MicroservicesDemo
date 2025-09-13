@@ -1,7 +1,7 @@
-import { sharedInterfaces } from './shared-interfaces';
+import { sharedInterfaces } from '../index';
 
 describe('sharedInterfaces', () => {
     it('should work', () => {
-        expect(sharedInterfaces()).toEqual('shared-interfaces');
+        expect(sharedInterfaces()).toBe('shared-interfaces');
     })
 })
