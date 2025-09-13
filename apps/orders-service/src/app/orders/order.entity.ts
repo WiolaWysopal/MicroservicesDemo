@@ -7,17 +7,9 @@ export interface OrderItem {
 
 export class Order {
     id!: number;
-    customName!: string;
+    customerName!: string;
     items!: OrderItem[];
     totalAmount!: number;
     status!: 'pending' | 'confirmed' | 'cancelled';
     createdAt!: Date;
-}
-
-export class CreateOrderDto {
-    customerName!: string;
-    items!: {
-        productId: number;
-        quantity: number;
-    }[];
 }
