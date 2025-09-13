@@ -1,0 +1,9 @@
+Otwórz Postman.
+Kliknij przycisk „Import” w lewym górnym rogu okna.
+Wybierz opcję „File” i wskaż wyeksportowany plik JSON kolekcji.
+Kliknij „Open”, a następnie „Import”.
+Pliki zostaną zaimportowane.
+
+-----------------------------------
+
+WAŻNE: Przed testowaniem na zmiennych środowiskowych należy je w Postmanie ustawiń na aktywne (Environment > {Variable} > isactive)
