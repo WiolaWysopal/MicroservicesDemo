@@ -2,16 +2,17 @@ import { Injectable, BadRequestException, NotFoundException } from '@nestjs/comm
 import { Order, OrderItem } from './order.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ProductsClientService } from '../services/products-client.service';
+import { IOrder, IOrderItem } from '@microservices-demo/shared-interfaces';
 
 @Injectable()
 export class OrdersService {
-  private orders: Order[] = [];
+  private orders: IOrder[] = [];
   private idCounter = 1;
 
   constructor(private readonly productsClient: ProductsClientService) {}
 
-  async create(createOrderDto: CreateOrderDto): Promise<Order> {
-    const orderItems: OrderItem[] = [];
+  async create(createOrderDto: CreateOrderDto): Promise<IOrder> {
+    const orderItems: IOrderItem[] = [];
     let totalAmount = 0;
 
 // Aggregate quantities by productId to validate combined availability
@@ -55,7 +56,7 @@ export class OrdersService {
     }
 
     // Utwórz zamówienie
-    const newOrder: Order = {
+    const newOrder: IOrder = {
       id: this.idCounter++,
       customerName: createOrderDto.customerName,
       items: orderItems,
@@ -68,11 +69,11 @@ export class OrdersService {
     return newOrder;
   }
 
-  findAll(): Order[] {
+  findAll(): IOrder[] {
     return this.orders;
   }
 
-  findOne(id: number): Order {
+  findOne(id: number): IOrder {
     const order = this.orders.find(o => o.id === id);
     if (!order) {
       throw new NotFoundException(`Order with ID ${id} not found`);
@@ -80,7 +81,7 @@ export class OrdersService {
     return order;
   }
 
-  updateStatus(id: number, status: Order['status']): Order {
+  updateStatus(id: number, status: IOrder['status']): IOrder {
     const order = this.findOne(id);
     order.status = status;
     return order;
