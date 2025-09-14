@@ -11,7 +11,7 @@ swcJestConfig.swcrc = false;
 
 export default {
   displayName: '@microservices-demo/shared-interfaces',
-  preset: '../jest.preset.js',
+  preset: '../../jest.preset.js',
   testEnvironment: 'node',
   transform: {
     '^.+\\.[tj]s$': ['@swc/jest', swcJestConfig]
