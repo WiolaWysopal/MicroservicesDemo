@@ -16,7 +16,7 @@
       "path": "./apps/orders-service"
     },
     {
-      "path": "./shared-interfaces"
+      "path": "./libs/shared-interfaces"
     }
   ],
   "compilerOptions": {
