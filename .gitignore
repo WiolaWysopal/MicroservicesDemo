@@ -44,3 +44,11 @@ Thumbs.db
 .github/instructions/nx.instructions.md
 
 test-output
+
+# Prisma
+prisma/dev.db
+prisma/*.db
+
+# Environment variables
+.env
+generated/
