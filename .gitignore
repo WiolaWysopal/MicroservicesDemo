@@ -52,3 +52,5 @@ prisma/*.db
 # Environment variables
 .env
 generated/
+*.db
+apps/**/prisma/*.db
