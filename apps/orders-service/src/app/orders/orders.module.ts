@@ -1,8 +1,10 @@
+// apps/orders-service/src/app/orders/orders.module.ts
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { ProductsClientService } from '../services/products-client.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
   imports: [
@@ -12,6 +14,6 @@ import { ProductsClientService } from '../services/products-client.service';
     }),
   ],
   controllers: [OrdersController],
-  providers: [OrdersService, ProductsClientService],
+  providers: [OrdersService, ProductsClientService, PrismaService],
 })
 export class OrdersModule {}
