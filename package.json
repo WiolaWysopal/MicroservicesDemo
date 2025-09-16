@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "seed:products": "ts-node apps/products-service/prisma/seed.ts"
   },
   "prisma": {
     "schema": "apps/products-service/prisma/schema.prisma"
