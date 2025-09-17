@@ -4,7 +4,13 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "seed:products": "ts-node apps/products-service/prisma/seed.ts"
+    "seed:products": "ts-node apps/products-service/prisma/seed.ts",
+    "prisma:generate:products": "prisma generate --schema apps/products-service/prisma/schema.prisma",
+    "prisma:generate:orders": "prisma generate --schema apps/orders-service/prisma/schema.prisma",
+    "prisma:migrate:products": "prisma migrate dev --schema apps/products-service/prisma/schema.prisma",
+    "prisma:migrate:orders": "prisma migrate dev --schema apps/orders-service/prisma/schema.prisma",
+    "prisma:studio:products": "prisma studio --schema apps/products-service/prisma/schema.prisma",
+    "prisma:studio:orders": "prisma studio --schema apps/orders-service/prisma/schema.prisma"
   },
   "prisma": {
     "schema": "apps/products-service/prisma/schema.prisma"
