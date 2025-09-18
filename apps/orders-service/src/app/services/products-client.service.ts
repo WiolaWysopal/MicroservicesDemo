@@ -5,6 +5,9 @@ import { AxiosError } from 'axios';
 
 @Injectable()
 export class ProductsClientService {
+  getHealth() {
+    throw new Error('Method not implemented.');
+  }
   private readonly productsServiceUrl = 'http://localhost:3000/api';
 
   constructor(private readonly httpService: HttpService) {}

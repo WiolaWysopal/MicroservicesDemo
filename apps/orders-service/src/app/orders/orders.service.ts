@@ -73,4 +73,13 @@ export class OrdersService {
     order.status = status;
     return order;
   }
+
+  // HEALTH FUNCTION
+  async getHealthService(): Promise<{ service: string; status: string; timestamp: string }> {
+  return {
+    service: 'orders-service',
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+  };
+}
 }

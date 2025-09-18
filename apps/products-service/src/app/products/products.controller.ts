@@ -7,6 +7,12 @@ import { Product } from './product.entity';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  // HEALTH ENDPOINT
+  @Get('/health')
+  async getHealth(): Promise<{ service: string; status: string; timestamp: string }> {
+    return this.productsService.getHealthProducts();
+  }
+
   @Get()
   findAll(): Product[] {
     return this.productsService.findAll();

@@ -7,6 +7,12 @@ import { Order } from './order.entity';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  // HEALTH ENDPOINT
+  @Get('/health')
+  async getHealth(): Promise<{ service: string; status: string; timestamp: string }> {
+    return this.ordersService.getHealthService();
+  }
+
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
