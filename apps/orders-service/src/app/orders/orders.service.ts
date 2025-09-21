@@ -20,7 +20,7 @@ export class OrdersService {
     for (const item of createOrderDto.items) {
       // Sprawdź czy produkt istnieje
       const product = await this.productsClient.getProduct(item.productId);
-      
+
       // Sprawdź dostępność
       const isAvailable = await this.productsClient.checkProductAvailability(
         item.productId,
