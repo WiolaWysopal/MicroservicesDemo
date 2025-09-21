@@ -45,7 +45,15 @@ Thumbs.db
 
 test-output
 
-/generated/prisma
+# Prisma
+prisma/dev.db
+prisma/*.db
+
+# Environment variables
+.env
+generated/
+*.db
+apps/**/prisma/*.db
 
 .env
 *.db
