@@ -1,4 +1,5 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Order, OrderItem } from './order.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ProductsClientService } from '../services/products-client.service';
 import { IOrder, IOrderItem } from '@microservices-demo/shared-interfaces';
@@ -14,31 +15,43 @@ export class OrdersService {
     const orderItems: IOrderItem[] = [];
     let totalAmount = 0;
 
-    // Walidacja i pobranie informacji o produktach
-    for (const item of createOrderDto.items) {
-      // Sprawdź czy produkt istnieje
-      const product = await this.productsClient.getProduct(item.productId);
-      
-      // Sprawdź dostępność
-      const isAvailable = await this.productsClient.checkProductAvailability(
-        item.productId,
-        item.quantity
-      );
+// Aggregate quantities by productId to validate combined availability
+    const aggregated = new Map<number, number>();
+    for (const { productId, quantity } of createOrderDto.items) {
+      aggregated.set(productId, (aggregated.get(productId) ?? 0) + quantity);
+    }
 
-      if (!isAvailable) {
-        throw new BadRequestException(
-          `Product ${product.name} is not available in requested quantity`
-        );
+    const uniqueProductIds = [...aggregated.keys()];
+
+    // Fetch product details and availability in parallel
+    const [products, availability] = await Promise.all([
+      Promise.all(uniqueProductIds.map((id) => this.productsClient.getProduct(id))),
+      Promise.all(uniqueProductIds.map((id) =>
+        this.productsClient.checkProductAvailability(id, aggregated.get(id)!)
+      )),
+    ]);
+
+    const productMap = new Map<number, { name: string; price: number }>();
+    products.forEach((p, idx) => productMap.set(uniqueProductIds[idx], { name: p.name, price: p.price }));
+
+    // Validate aggregated availability
+    availability.forEach((ok, idx) => {
+      if (!ok) {
+        const id = uniqueProductIds[idx];
+        const p = productMap.get(id);
+        throw new BadRequestException(`Product ${p?.name ?? id} is not available in requested quantity`);
       }
+    });
 
-      // Przygotuj pozycję zamówienia
+    // Build order items preserving original lines
+    for (const item of createOrderDto.items) {
+      const product = productMap.get(item.productId)!;
       orderItems.push({
         productId: item.productId,
         productName: product.name,
         quantity: item.quantity,
         price: product.price,
       });
-
       totalAmount += product.price * item.quantity;
     }
 
@@ -63,7 +76,7 @@ export class OrdersService {
   findOne(id: number): IOrder {
     const order = this.orders.find(o => o.id === id);
     if (!order) {
-      throw new BadRequestException(`Order with ID ${id} not found`);
+      throw new NotFoundException(`Order with ID ${id} not found`);
     }
     return order;
   }
