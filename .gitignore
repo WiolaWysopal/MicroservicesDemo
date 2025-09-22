@@ -45,7 +45,6 @@ Thumbs.db
 
 test-output
 
-<<<<<<< HEAD
 # Prisma
 prisma/dev.db
 prisma/*.db
@@ -55,11 +54,9 @@ prisma/*.db
 generated/
 *.db
 apps/**/prisma/*.db
-=======
 /generated/prisma
 
 # ignoruj katalogi prisma w usługach
 apps/*/prisma/
 # ignoruj wszystkie pliki .db
 *.db
->>>>>>> 1ab05ce (Ignore prisma folders and db files)
