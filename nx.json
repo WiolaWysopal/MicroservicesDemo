@@ -29,7 +29,10 @@
           "buildDepsName": "build-deps",
           "watchDepsName": "watch-deps"
         }
-      }
+      },
+      "exclude": [
+        "shared/*"
+      ]
     },
     {
       "plugin": "@nx/webpack/plugin",
@@ -48,14 +51,37 @@
         "targetName": "test"
       },
       "exclude": [
-        "apps/products-service-e2e/**/*"
+        "apps/products-service-e2e/**/*",
+        "orders-service-e2e/**/*",
+        "apps/orders-service-e2e/**/*"
       ]
+    },
+    {
+      "plugin": "@nx/js/typescript",
+      "include": [
+        "shared/*"
+      ],
+      "options": {
+        "typecheck": {
+          "targetName": "typecheck"
+        }
+      }
     }
   ],
   "targetDefaults": {
     "test": {
       "dependsOn": [
         "^build"
+      ]
+    },
+    "@nx/js:tsc": {
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
       ]
     }
   }

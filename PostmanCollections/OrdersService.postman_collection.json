@@ -1,0 +1,117 @@
+{
+	"info": {
+		"_postman_id": "b7f9a16b-d41a-46a1-a0fb-94de634c093f",
+		"name": "OrdersService",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38063892",
+		"_collection_link": "https://lonelymaster-7213.postman.co/workspace/WiolaWysopal~6f203b46-93b8-4a47-8516-9fbc75705bc1/collection/38063892-b7f9a16b-d41a-46a1-a0fb-94de634c093f?action=share&source=collection_link&creator=38063892"
+	},
+	"item": [
+		{
+			"name": "Walidacja danych",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"customerName\": \"Janina Kowalska\",\r\n  \"items\": [\r\n    { \"productId\": 1, \"quantity\": 2 }\r\n  ]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{ORDERS_SERVICE}}",
+					"host": [
+						"{{ORDERS_SERVICE}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Order",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"customerName\": \"Jan Kowalski\",\r\n  \"items\": [\r\n    { \"productId\": 1, \"quantity\": 2 },\r\n    { \"productId\": 2, \"quantity\": 1 }\r\n  ]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{ORDERS_SERVICE}}",
+					"host": [
+						"{{ORDERS_SERVICE}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "See created Orders",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{ORDERS_SERVICE}}",
+					"host": [
+						"{{ORDERS_SERVICE}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "See order :id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{ORDERS_SERVICE}}5",
+					"host": [
+						"{{ORDERS_SERVICE}}5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change Order Status",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"status\": \"pending\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{ORDERS_SERVICE}}2/status",
+					"host": [
+						"{{ORDERS_SERVICE}}2"
+					],
+					"path": [
+						"status"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

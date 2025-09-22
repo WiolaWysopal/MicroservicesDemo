@@ -8,6 +8,22 @@
     },
     {
       "path": "./apps/products-service"
+    },
+    {
+      "path": "./apps/orders-service-e2e"
+    },
+    {
+      "path": "./apps/orders-service"
+    },
+    {
+      "path": "./libs/shared-interfaces"
+    },
+    {
+      "path": "./libs/shared"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext"
+  }
 }
