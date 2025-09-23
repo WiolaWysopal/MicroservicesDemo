@@ -1,55 +1,61 @@
-// products/products.controller.ts
-import { Controller, Get, Post, Put, Param, Body, HttpCode, HttpStatus, Patch } from '@nestjs/common';
+// apps/products-service/src/app/products/products.controller.ts
+import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { Product } from './product.entity';
+import { Product, Prisma } from '@prisma/client';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  findAll(): Product[] {
+  async findAll(): Promise<Product[]> {
     return this.productsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Product {
+  async findOne(@Param('id') id: string): Promise<Product> {
     return this.productsService.findOne(parseInt(id));
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() productData: Partial<Product>): Product {
+  async create(@Body() productData: Prisma.ProductCreateInput): Promise<Product> {
     return this.productsService.create(productData);
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id') id: string,
-    @Body() productData: Partial<Product>
-  ): Product {
+    @Body() productData: Prisma.ProductUpdateInput
+  ): Promise<Product> {
     return this.productsService.update(parseInt(id), productData);
   }
 
-  // Endpoint dla sprawdzenia dostępności (używany przez Orders Service)
+  @Delete(':id')
+  async delete(@Param('id') id: string): Promise<Product> {
+    return this.productsService.delete(parseInt(id));
+  }
+
   @Get(':id/availability/:quantity')
-  checkAvailability(
+  async checkAvailability(
     @Param('id') id: string,
     @Param('quantity') quantity: string
-  ): { available: boolean } {
-    const available = this.productsService.checkAvailability(
+  ): Promise<{ available: boolean }> {
+    const available = await this.productsService.checkAvailability(
       parseInt(id),
       parseInt(quantity)
     );
     return { available };
   }
 
-  // Endpoint do sprawdzenia zmiejszania ilości na magazynie
-  @Patch(':id/decrease')
-  decreaseQuantity(
-  @Param('id') id: string,
-  @Body() body: {quantity: number}
-  ) {
-    return this.productsService.decreaseQuantity(parseInt(id), body.quantity); 
+  @Post(':id/decrease-quantity/:quantity')
+  async decreaseQuantity(
+    @Param('id') id: string,
+    @Param('quantity') quantity: string
+  ): Promise<Product> {
+    return this.productsService.decreaseQuantity(
+      parseInt(id),
+      parseInt(quantity)
+    );
   }
 }

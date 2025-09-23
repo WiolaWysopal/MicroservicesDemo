@@ -32,7 +32,14 @@ export class OrdersService {
     ]);
 
     const productMap = new Map<number, { name: string; price: number }>();
-    products.forEach((p, idx) => productMap.set(uniqueProductIds[idx], { name: p.name, price: p.price }));
+    products.forEach((p, idx) => {
+      if (typeof p.price !== 'number' || Number.isNaN(p.price)) {
+        throw new BadRequestException(
+          `Product ${uniqueProductIds[idx]} is missing a valid numeric price`
+        );
+      }
+      productMap.set(uniqueProductIds[idx], { name: p.name, price: p.price });
+    });
 
     // Validate aggregated availability
     availability.forEach((ok, idx) => {

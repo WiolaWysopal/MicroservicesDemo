@@ -137,33 +137,25 @@
 			"response": []
 		},
 		{
-			"name": "decreaseQuantity()",
-			"request": {
-				"method": "PATCH",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{ \"quantity\": 1 }\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{PRODUCTS_SERVICE}}/products/2/decrease",
-					"host": [
-						"{{PRODUCTS_SERVICE}}"
-					],
-					"path": [
-						"products",
-						"2",
-						"decrease"
-					]
-				},
-				"description": "Reduces the quantity of available goods by the specified number in Body"
+		"name": "decreaseQuantity()",
+		"request": {
+			"method": "PATCH",
+			"header": [],
+			"body": {
+			"mode": "raw",
+			"raw": "{ \"quantity\": 1 }\r\n",
+			"options": {
+				"raw": { "language": "json" }
+			}
 			},
-			"response": []
+			"url": {
+			"raw": "{{PRODUCTS_SERVICE}}/products/2/decrease",
+			"host": ["{{PRODUCTS_SERVICE}}"],
+			"path": ["products","2","decrease"]
+			},
+			"description": "Reduces the quantity of available goods by the specified number in Body"
+		},
+		"response": []
 		}
 	],
 	"event": [

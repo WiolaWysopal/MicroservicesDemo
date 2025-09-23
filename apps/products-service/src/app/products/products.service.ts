@@ -6,6 +6,10 @@ import { Product, Prisma } from '@prisma/client';
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
+  async findAll(): Promise<Product[]> {
+    return this.prisma.product.findMany();
+  }
+    
   private validateId(id: number) {
     if (!Number.isInteger(id) || id <= 0) {
       throw new BadRequestException('Invalid product ID');
@@ -43,12 +47,14 @@ export class ProductsService {
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
+    
     return product;
   }
 
   async create(data: Prisma.ProductCreateInput): Promise<Product> {
-    this.validateData(data);
-    return this.prisma.product.create({ data });
+    return this.prisma.product.create({
+      data,
+    });
   }
 
   async update(id: number, data: Prisma.ProductUpdateInput): Promise<Product> {
@@ -66,6 +72,11 @@ export class ProductsService {
   }
 
   async delete(id: number): Promise<Product> {
+    try {
+      return await this.prisma.product.delete({
+        where: { id },
+      });
+    } catch (error) {
     this.validateId(id);
     try {
       return await this.prisma.product.delete({ where: { id } });
@@ -85,6 +96,7 @@ export class ProductsService {
   }
 
   async decreaseQuantity(id: number, quantity: number): Promise<Product> {
+    const product = await this.findOne(id);
     this.validateId(id);
     this.validateQuantity(quantity);
 
@@ -93,6 +105,14 @@ export class ProductsService {
     if (product.quantity < quantity) {
       throw new BadRequestException('Insufficient quantity');
     }
+    
+    return this.prisma.product.update({
+      where: { id },
+      data: {
+        quantity: {
+          decrement: quantity,
+        },
+      },
 
     return this.prisma.product.update({
       where: { id },
