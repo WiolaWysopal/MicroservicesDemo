@@ -1,11 +1,14 @@
+// src/products/products.service.ts
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Product, Prisma } from '@prisma/client';
+import { Product } from '@prisma/client';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
-
+  
   async findAll(): Promise<Product[]> {
     return this.prisma.product.findMany();
   }
@@ -37,33 +40,14 @@ export class ProductsService {
     }
   }
 
-  async findAll(): Promise<Product[]> {
-    return this.prisma.product.findMany();
+  async create(data: CreateProductDto): Promise<Product> {
+    return this.prisma.product.create({ data });
   }
 
-  async findOne(id: number): Promise<Product> {
-    this.validateId(id);
-    const product = await this.prisma.product.findUnique({ where: { id } });
-    if (!product) {
-      throw new NotFoundException(`Product with ID ${id} not found`);
-    }
-    
-    return product;
-  }
-
-  async create(data: Prisma.ProductCreateInput): Promise<Product> {
-    return this.prisma.product.create({
-      data,
-    });
-  }
-
-  async update(id: number, data: Prisma.ProductUpdateInput): Promise<Product> {
-    this.validateId(id);
-    this.validateData(data);
-
+  async update(id: number, data: UpdateProductDto): Promise<Product> {
     try {
       return await this.prisma.product.update({ where: { id }, data });
-    } catch (error:any) {
+    } catch (error: any) {
       if (error.code === 'P2025') {
         throw new NotFoundException(`Product with ID ${id} not found`);
       }
@@ -78,28 +62,14 @@ export class ProductsService {
       });
     } catch (error) {
     this.validateId(id);
-    try {
-      return await this.prisma.product.delete({ where: { id } });
-    } catch (error : any) {
-      if (error.code === 'P2025') {
-        throw new NotFoundException(`Product with ID ${id} not found`);
-      }
-      throw error;
-    }
   }
 
   async checkAvailability(id: number, requestedQuantity: number): Promise<boolean> {
-    this.validateId(id);
-    this.validateQuantity(requestedQuantity);
     const product = await this.findOne(id);
     return product.quantity >= requestedQuantity;
   }
 
   async decreaseQuantity(id: number, quantity: number): Promise<Product> {
-    const product = await this.findOne(id);
-    this.validateId(id);
-    this.validateQuantity(quantity);
-
     const product = await this.findOne(id);
 
     if (product.quantity < quantity) {
