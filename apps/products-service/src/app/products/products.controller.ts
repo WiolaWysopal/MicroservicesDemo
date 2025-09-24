@@ -11,12 +11,15 @@ export class ProductsController {
 
   @Get()
   findAll(): Promise<Product[]> {
+  async findAll(): Promise<Product[]> {
     return this.productsService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Product> {
     return this.productsService.findOne(id);
+  async findOne(@Param('id') id: string): Promise<Product> {
+    return this.productsService.findOne(parseInt(id));
   }
 
   @Post()
@@ -51,5 +54,12 @@ export class ProductsController {
     @Body() body: { quantity: number },
   ): Promise<Product> {
     return this.productsService.decreaseQuantity(id, body.quantity);
+  async create(@Body() productData: Prisma.ProductCreateInput): Promise<Product> {
+    return this.productsService.create(productData);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string): Promise<Product> {
+    return this.productsService.delete(parseInt(id));
   }
 }

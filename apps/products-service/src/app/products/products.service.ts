@@ -8,17 +8,36 @@ import { UpdateProductDto } from './dto/update-product.dto';
 @Injectable()
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
-
+  
   async findAll(): Promise<Product[]> {
     return this.prisma.product.findMany();
   }
-
-  async findOne(id: number): Promise<Product> {
-    const product = await this.prisma.product.findUnique({ where: { id } });
-    if (!product) {
-      throw new NotFoundException(`Product with ID ${id} not found`);
+    
+  private validateId(id: number) {
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new BadRequestException('Invalid product ID');
     }
-    return product;
+  }
+
+  private validateData(data: Prisma.ProductCreateInput | Prisma.ProductUpdateInput) {
+    if (!data || typeof data !== 'object') {
+      throw new BadRequestException('Invalid product data');
+    }
+    if ('name' in data && (!data.name || typeof data.name !== 'string')) {
+      throw new BadRequestException('Product name must be a non-empty string');
+    }
+    if ('price' in data && (typeof data.price !== 'number' || data.price < 0)) {
+      throw new BadRequestException('Product price must be a non-negative number');
+    }
+    if ('quantity' in data && (!Number.isInteger(data.quantity) || data.quantity < 0)) {
+      throw new BadRequestException('Product quantity must be a non-negative integer');
+    }
+  }
+
+  private validateQuantity(quantity: number) {
+    if (!Number.isInteger(quantity) || quantity < 0) {
+      throw new BadRequestException('Requested quantity must be a non-negative integer');
+    }
   }
 
   async create(data: CreateProductDto): Promise<Product> {
@@ -38,13 +57,11 @@ export class ProductsService {
 
   async delete(id: number): Promise<Product> {
     try {
-      return await this.prisma.product.delete({ where: { id } });
-    } catch (error: any) {
-      if (error.code === 'P2025') {
-        throw new NotFoundException(`Product with ID ${id} not found`);
-      }
-      throw error;
-    }
+      return await this.prisma.product.delete({
+        where: { id },
+      });
+    } catch (error) {
+    this.validateId(id);
   }
 
   async checkAvailability(id: number, requestedQuantity: number): Promise<boolean> {
@@ -58,6 +75,14 @@ export class ProductsService {
     if (product.quantity < quantity) {
       throw new BadRequestException('Insufficient quantity');
     }
+    
+    return this.prisma.product.update({
+      where: { id },
+      data: {
+        quantity: {
+          decrement: quantity,
+        },
+      },
 
     return this.prisma.product.update({
       where: { id },
