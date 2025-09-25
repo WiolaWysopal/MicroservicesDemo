@@ -17,6 +17,9 @@
     },
     {
       "path": "./libs/shared-interfaces"
+    },
+    {
+      "path": "./libs/shared"
     }
   ],
   "compilerOptions": {

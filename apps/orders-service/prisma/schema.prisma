@@ -6,25 +6,33 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./orders.db"
+  url      = env("ORDERS_DATABASE_URL")
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  cancelled
 }
 
 model Order {
-  id           Int         @id @default(autoincrement())
+  id           Int          @id @default(autoincrement())
   customerName String
-  totalAmount  Float
-  status       String      @default("pending")
+  totalAmount  Decimal
+  status       OrderStatus  @default(pending)
   items        OrderItem[]
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }
 
 model OrderItem {
-  id          Int    @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   orderId     Int
-  order       Order  @relation(fields: [orderId], references: [id])
+  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId   Int
   productName String
   quantity    Int
-  price       Float
+  price       Decimal
+
+  @@unique([orderId, productId])
 }
