@@ -1,7 +1,9 @@
-// apps/products-service/src/app/products/products.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+// src/products/products.service.ts
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Product, Prisma } from '@prisma/client';
+import { Product } from '@prisma/client';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -12,30 +14,21 @@ export class ProductsService {
   }
 
   async findOne(id: number): Promise<Product> {
-    const product = await this.prisma.product.findUnique({
-      where: { id },
-    });
-    
+    const product = await this.prisma.product.findUnique({ where: { id } });
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
-    
     return product;
   }
 
-  async create(data: Prisma.ProductCreateInput): Promise<Product> {
-    return this.prisma.product.create({
-      data,
-    });
+  async create(data: CreateProductDto): Promise<Product> {
+    return this.prisma.product.create({ data });
   }
 
-  async update(id: number, data: Prisma.ProductUpdateInput): Promise<Product> {
+  async update(id: number, data: UpdateProductDto): Promise<Product> {
     try {
-      return await this.prisma.product.update({
-        where: { id },
-        data,
-      });
-    } catch (error) {
+      return await this.prisma.product.update({ where: { id }, data });
+    } catch (error: any) {
       if (error.code === 'P2025') {
         throw new NotFoundException(`Product with ID ${id} not found`);
       }
@@ -45,10 +38,8 @@ export class ProductsService {
 
   async delete(id: number): Promise<Product> {
     try {
-      return await this.prisma.product.delete({
-        where: { id },
-      });
-    } catch (error) {
+      return await this.prisma.product.delete({ where: { id } });
+    } catch (error: any) {
       if (error.code === 'P2025') {
         throw new NotFoundException(`Product with ID ${id} not found`);
       }
@@ -63,18 +54,14 @@ export class ProductsService {
 
   async decreaseQuantity(id: number, quantity: number): Promise<Product> {
     const product = await this.findOne(id);
-    
+
     if (product.quantity < quantity) {
-      throw new Error('Insufficient quantity');
+      throw new BadRequestException('Insufficient quantity');
     }
-    
+
     return this.prisma.product.update({
       where: { id },
-      data: {
-        quantity: {
-          decrement: quantity,
-        },
-      },
+      data: { quantity: { decrement: quantity } },
     });
   }
 }
