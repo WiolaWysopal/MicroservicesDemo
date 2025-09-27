@@ -7,14 +7,19 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
+    "prisma:migrate:products": "prisma migrate dev --schema apps/products-service/prisma/schema.prisma",
     "db:push": "prisma db push",
     "postinstall": "prisma generate"
+  },
+  "prisma": {
+    "schema": "apps/products-service/prisma/schema.prisma"
   },
   "private": true,
   "dependencies": {
     "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
+    "@nestjs/mapped-types": "^2.1.0",
     "@nestjs/platform-express": "^11.0.0",
     "@prisma/client": "^6.15.0",
     "axios": "^1.11.0",
