@@ -1,9 +1,6 @@
-// src/products/products.service.ts
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Product } from '@prisma/client';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { Product, Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductsService {
@@ -21,14 +18,14 @@ export class ProductsService {
     return product;
   }
 
-  async create(data: CreateProductDto): Promise<Product> {
+  async create(data: Prisma.ProductCreateInput): Promise<Product> {
     return this.prisma.product.create({ data });
   }
 
-  async update(id: number, data: UpdateProductDto): Promise<Product> {
+  async update(id: number, data: Prisma.ProductUpdateInput): Promise<Product> {
     try {
       return await this.prisma.product.update({ where: { id }, data });
-    } catch (error: any) {
+    } catch (error:any) {
       if (error.code === 'P2025') {
         throw new NotFoundException(`Product with ID ${id} not found`);
       }
@@ -39,7 +36,7 @@ export class ProductsService {
   async delete(id: number): Promise<Product> {
     try {
       return await this.prisma.product.delete({ where: { id } });
-    } catch (error: any) {
+    } catch (error : any) {
       if (error.code === 'P2025') {
         throw new NotFoundException(`Product with ID ${id} not found`);
       }
