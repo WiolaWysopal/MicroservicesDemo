@@ -54,6 +54,12 @@ prisma/*.db
 generated/
 *.db
 apps/**/prisma/*.db
+/generated/prisma
+
+# ignoruj katalogi prisma w usługach
+apps/*/prisma/
+# ignoruj wszystkie pliki .db
+*.db
 
 .env
 *.db
