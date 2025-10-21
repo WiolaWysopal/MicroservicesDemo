@@ -21,11 +21,16 @@ async function main() {
   console.log('Seed data created successfully');
 }
 
+let hasError = false;
+
 main()
   .catch((e) => {
     console.error(e);
-    process.exit(1);
+    hasError = true;
   })
   .finally(async () => {
     await prisma.$disconnect();
+    if (hasError) {
+      process.exit(1);
+    }
   });

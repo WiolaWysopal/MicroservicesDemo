@@ -21,20 +21,20 @@ export class OrdersController {
   }
 
   @Get()
-  findAll(): Order[] {
+  async findAll(): Promise<Order[]> {
     return this.ordersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Order {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Order> {
     return this.ordersService.findOne(id);
   }
 
   @Patch(':id/status')
-  updateStatus(
+  async updateStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateOrderStatusDto
-  ): Order {
+  ): Promise<Order> {
     return this.ordersService.updateStatus(id, dto.status);
   }
 }
