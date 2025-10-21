@@ -82,18 +82,18 @@ http://localhost:3000/api/products
 http://localhost:3002/api/orders
 ```
 
-## Opis API endpoints
+## Opis endpointów API
 
 ### ProductsService
 
-| Endpoint                                 | Metoda | Opis                         |
-| ---------------------------------------- | ------ | ---------------------------- |
-| `/api/products`                          | GET    | Pobiera wszystkie produkty   |
-| `/api/products/:id`                      | GET    | Pobiera produkt po ID        |
-| `/api/products`                          | POST   | Tworzy nowy produkt          |
-| `/api/products/:id`                      | PUT    | Aktualizuje produkt po ID    |
-| `/api/products/:id/availability/:amount` | GET    | Sprawdza dostępność produktu |
-| `/api/products/:id/decrease`             | PATCH  | Zmniejsza ilość produktu     |
+| Endpoint                                        | Metoda | Opis                         |
+| ----------------------------------------------- | ------ | ---------------------------- |
+| `/api/products`                                 | GET    | Pobiera wszystkie produkty   |
+| `/api/products/:id`                             | GET    | Pobiera produkt po ID        |
+| `/api/products`                                 | POST   | Tworzy nowy produkt          |
+| `/api/products/:id`                             | PUT    | Aktualizuje produkt po ID    |
+| `/api/products/:id/availability/:quantity`      | GET    | Sprawdza dostępność produktu |
+| `/api/products/:id/decrease-quantity/:quantity` | PATCH  | Zmniejsza ilość produktu     |
 
 ### Orders Service
 
