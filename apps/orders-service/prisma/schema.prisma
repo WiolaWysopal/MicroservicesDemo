@@ -1,17 +1,38 @@
 // apps/orders-service/prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
+  output   = "../../../node_modules/@prisma/client/orders"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+  url      = env("ORDERS_DATABASE_URL")
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  cancelled
 }
 
 model Order {
-  id        Int      @id @default(autoincrement())
-  productId Int
-  quantity  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int          @id @default(autoincrement())
+  customerName String
+  totalAmount  Decimal
+  status       OrderStatus  @default(pending)
+  items        OrderItem[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model OrderItem {
+  id          Int     @id @default(autoincrement())
+  orderId     Int
+  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   Int
+  productName String
+  quantity    Int
+  price       Decimal
+
+  @@unique([orderId, productId])
 }

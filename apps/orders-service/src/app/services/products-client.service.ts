@@ -5,6 +5,19 @@ import { AxiosError } from 'axios';
 
 @Injectable()
 export class ProductsClientService {
+
+// Dodaj nową metodę
+async decreaseQuantity(productId: number, quantity: number): Promise<void> {
+  try {
+    await firstValueFrom(
+      this.httpService.post(
+        `${this.productsServiceUrl}/products/${productId}/decrease-quantity/${quantity}`
+      )
+    );
+  } catch (error) {
+    this.handleError(error as AxiosError);
+  }
+}
   private readonly productsServiceUrl = 'http://localhost:3000/api';
 
   constructor(private readonly httpService: HttpService) {}
