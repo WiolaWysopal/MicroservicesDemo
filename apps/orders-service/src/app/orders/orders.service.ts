@@ -1,5 +1,4 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { Order, OrderItem } from './order.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ProductsClientService } from '../services/products-client.service';
 import { IOrder, IOrderItem } from '@microservices-demo/shared-interfaces';
