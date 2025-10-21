@@ -5,6 +5,7 @@ import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { ProductsClientService } from '../services/products-client.service';
 import { PrismaModule } from '../prisma/prisma.module'; // <- dodaj import
+import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { PrismaModule } from '../prisma/prisma.module'; // <- dodaj import
     PrismaModule, // <- dodaj tutaj
   ],
   controllers: [OrdersController],
-  providers: [OrdersService, ProductsClientService],
+  providers: [OrdersService, ProductsClientService, PrismaService],
 })
 export class OrdersModule {}
