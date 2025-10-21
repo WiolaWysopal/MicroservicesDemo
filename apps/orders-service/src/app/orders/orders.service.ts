@@ -1,5 +1,5 @@
 // apps/orders-service/src/app/orders/orders.service.ts
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Order, OrderItem, Prisma } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -7,12 +7,14 @@ import { ProductsClientService } from '../services/products-client.service';
 
 @Injectable()
 export class OrdersService {
+  private readonly logger = new Logger(OrdersService.name);
   constructor(
     private prisma: PrismaService,
     private readonly productsClient: ProductsClientService
   ) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
+    this.logger.log(`Creating new order for customer: ${createOrderDto.customerName}`);
     const orderItems: Prisma.OrderItemCreateWithoutOrderInput[] = [];
     let totalAmount = 0;
 
@@ -20,6 +22,7 @@ export class OrdersService {
     for (const item of createOrderDto.items) {
       // Sprawdź czy produkt istnieje
       const product = await this.productsClient.getProduct(item.productId);
+      this.logger.debug(`Fetched product ${product.name} with ID ${item.productId}`);
 
       // Sprawdź dostępność
       const isAvailable = await this.productsClient.checkProductAvailability(
@@ -28,6 +31,7 @@ export class OrdersService {
       );
 
       if (!isAvailable) {
+        this.logger.warn(`Product ${product.name} not available in requested quantity`);
         throw new BadRequestException(
           `Product ${product.name} is not available in requested quantity`
         );
@@ -58,6 +62,7 @@ export class OrdersService {
         items: true,
       },
     });
+    this.logger.log(`Order created successfully with ID: ${order.id}`);
 
     // Zmniejsz stan magazynowy produktów
     for (const item of createOrderDto.items) {
@@ -68,6 +73,7 @@ export class OrdersService {
   }
 
   async findAll(): Promise<Order[]> {
+    this.logger.log('Fetching all orders');
     return this.prisma.order.findMany({
       include: {
         items: true,
@@ -76,6 +82,7 @@ export class OrdersService {
   }
 
   async findOne(id: number): Promise<Order> {
+    this.logger.log(`Fetching order with ID: ${id}`);
     const order = await this.prisma.order.findUnique({
       where: { id },
       include: {
@@ -84,6 +91,7 @@ export class OrdersService {
     });
 
     if (!order) {
+      this.logger.warn(`Order with ID ${id} not found`);
       throw new BadRequestException(`Order with ID ${id} not found`);
     }
 
@@ -92,14 +100,18 @@ export class OrdersService {
 
   async updateStatus(id: number, status: string): Promise<Order> {
     try {
-      return await this.prisma.order.update({
+      this.logger.log(`Updating status of order ${id} to "${status}"`);
+      const updatedOrder = await this.prisma.order.update({
         where: { id },
         data: { status },
         include: {
           items: true,
         },
       });
+      this.logger.log(`Order ${id} status updated successfully`);
+      return updatedOrder;
     } catch (error: any) {
+      this.logger.error(`Failed to update status for order ${id}`, error.stack);
       if (error.code === 'P2025') {
         throw new BadRequestException(`Order with ID ${id} not found`);
       }
@@ -109,13 +121,17 @@ export class OrdersService {
 
   async delete(id: number): Promise<Order> {
     try {
-      return await this.prisma.order.delete({
+      this.logger.log(`Deleting order with ID: ${id}`);
+      const deletedOrder = await this.prisma.order.delete({
         where: { id },
         include: {
           items: true,
         },
       });
+      this.logger.log(`Order ${id} deleted successfully`);
+      return deletedOrder;
     } catch (error: any) {
+      this.logger.error(`Failed to delete order ${id}`, error.stack);
       if (error.code === 'P2025') {
         throw new BadRequestException(`Order with ID ${id} not found`);
       }
@@ -125,6 +141,7 @@ export class OrdersService {
 
   // HEALTH FUNCTION
   async getHealthService(): Promise<{ service: string; status: string; timestamp: string }> {
+  this.logger.log('Checking health of orders-service');
   return {
     service: 'orders-service',
     status: 'ok',

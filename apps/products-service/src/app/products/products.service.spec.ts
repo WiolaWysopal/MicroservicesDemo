@@ -1,16 +1,44 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { ProductsService } from './products.service';
-import { NotFoundException } from "@nestjs/common";
+import { NotFoundException, Logger } from "@nestjs/common";
+import { PrismaService } from '../prisma/prisma.service';
 
 describe('ProductsService', () => {
     let service: ProductsService;
 
+    // Mock PrismaService
+    const mockPrismaService = {
+        product: {
+            findMany: jest.fn(),
+            findUnique: jest.fn(),
+            create: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn(),
+        },
+    };
+
+    beforeAll(() => {
+        // Suppress logger output during tests
+        jest.spyOn(Logger.prototype, 'log').mockImplementation();
+        jest.spyOn(Logger.prototype, 'error').mockImplementation();
+        jest.spyOn(Logger.prototype, 'warn').mockImplementation();
+        jest.spyOn(Logger.prototype, 'debug').mockImplementation();
+        jest.spyOn(Logger.prototype, 'verbose').mockImplementation();
+    });
+
     beforeEach( async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [ProductsService],
+            providers: [
+                ProductsService,
+                {
+                    provide: PrismaService,
+                    useValue: mockPrismaService,
+                },
+            ],
         }).compile();
 
         service = module.get<ProductsService>(ProductsService);
+        jest.clearAllMocks();
     });
 
     it('should be defined', () => {
