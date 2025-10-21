@@ -1,125 +1,95 @@
-// apps/orders-service/src/app/orders/orders.service.ts
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { Order, OrderItem, Prisma } from '@prisma/client';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ProductsClientService } from '../services/products-client.service';
+import { IOrder, IOrderItem } from '@microservices-demo/shared-interfaces';
 
 @Injectable()
 export class OrdersService {
-  constructor(
-    private prisma: PrismaService,
-    private readonly productsClient: ProductsClientService
-  ) {}
+  private orders: IOrder[] = [];
+  private idCounter = 1;
 
-  async create(createOrderDto: CreateOrderDto): Promise<Order> {
-    const orderItems: Prisma.OrderItemCreateWithoutOrderInput[] = [];
+  constructor(private readonly productsClient: ProductsClientService) {}
+
+  async create(createOrderDto: CreateOrderDto): Promise<IOrder> {
+    const orderItems: IOrderItem[] = [];
     let totalAmount = 0;
 
-    // Walidacja i pobranie informacji o produktach
-    for (const item of createOrderDto.items) {
-      // Sprawdź czy produkt istnieje
-      const product = await this.productsClient.getProduct(item.productId);
+// Aggregate quantities by productId to validate combined availability
+    const aggregated = new Map<number, number>();
+    for (const { productId, quantity } of createOrderDto.items) {
+      aggregated.set(productId, (aggregated.get(productId) ?? 0) + quantity);
+    }
 
-      // Sprawdź dostępność
-      const isAvailable = await this.productsClient.checkProductAvailability(
-        item.productId,
-        item.quantity
-      );
+    const uniqueProductIds = [...aggregated.keys()];
 
-      if (!isAvailable) {
+    // Fetch product details and availability in parallel
+    const [products, availability] = await Promise.all([
+      Promise.all(uniqueProductIds.map((id) => this.productsClient.getProduct(id))),
+      Promise.all(uniqueProductIds.map((id) =>
+        this.productsClient.checkProductAvailability(id, aggregated.get(id)!)
+      )),
+    ]);
+
+    const productMap = new Map<number, { name: string; price: number }>();
+    products.forEach((p, idx) => {
+      if (typeof p.price !== 'number' || Number.isNaN(p.price)) {
         throw new BadRequestException(
-          `Product ${product.name} is not available in requested quantity`
+          `Product ${uniqueProductIds[idx]} is missing a valid numeric price`
         );
       }
+      productMap.set(uniqueProductIds[idx], { name: p.name, price: p.price });
+    });
 
-      // Przygotuj pozycję zamówienia
+    // Validate aggregated availability
+    availability.forEach((ok, idx) => {
+      if (!ok) {
+        const id = uniqueProductIds[idx];
+        const p = productMap.get(id);
+        throw new BadRequestException(`Product ${p?.name ?? id} is not available in requested quantity`);
+      }
+    });
+
+    // Build order items preserving original lines
+    for (const item of createOrderDto.items) {
+      const product = productMap.get(item.productId)!;
       orderItems.push({
         productId: item.productId,
         productName: product.name,
         quantity: item.quantity,
         price: product.price,
       });
-
       totalAmount += product.price * item.quantity;
     }
 
-    // Utwórz zamówienie w bazie danych
-    const order = await this.prisma.order.create({
-      data: {
-        customerName: createOrderDto.customerName,
-        totalAmount,
-        status: 'confirmed',
-        items: {
-          create: orderItems,
-        },
-      },
-      include: {
-        items: true,
-      },
-    });
+    // Utwórz zamówienie
+    const newOrder: IOrder = {
+      id: this.idCounter++,
+      customerName: createOrderDto.customerName,
+      items: orderItems,
+      totalAmount,
+      status: 'confirmed',
+      createdAt: new Date(),
+    };
 
-    // Zmniejsz stan magazynowy produktów
-    for (const item of createOrderDto.items) {
-       await this.productsClient.decreaseQuantity(item.productId, item.quantity);
-     }
-
-    return order;
+    this.orders.push(newOrder);
+    return newOrder;
   }
 
-  async findAll(): Promise<Order[]> {
-    return this.prisma.order.findMany({
-      include: {
-        items: true,
-      },
-    });
+  findAll(): IOrder[] {
+    return this.orders;
   }
 
-  async findOne(id: number): Promise<Order> {
-    const order = await this.prisma.order.findUnique({
-      where: { id },
-      include: {
-        items: true,
-      },
-    });
-
+  findOne(id: number): IOrder {
+    const order = this.orders.find(o => o.id === id);
     if (!order) {
-      throw new BadRequestException(`Order with ID ${id} not found`);
+      throw new NotFoundException(`Order with ID ${id} not found`);
     }
-
     return order;
   }
 
-  async updateStatus(id: number, status: string): Promise<Order> {
-    try {
-      return await this.prisma.order.update({
-        where: { id },
-        data: { status },
-        include: {
-          items: true,
-        },
-      });
-    } catch (error: any) {
-      if (error.code === 'P2025') {
-        throw new BadRequestException(`Order with ID ${id} not found`);
-      }
-      throw error;
-    }
-  }
-
-  async delete(id: number): Promise<Order> {
-    try {
-      return await this.prisma.order.delete({
-        where: { id },
-        include: {
-          items: true,
-        },
-      });
-    } catch (error: any) {
-      if (error.code === 'P2025') {
-        throw new BadRequestException(`Order with ID ${id} not found`);
-      }
-      throw error;
-    }
+  updateStatus(id: number, status: IOrder['status']): IOrder {
+    const order = this.findOne(id);
+    order.status = status;
+    return order;
   }
 }
