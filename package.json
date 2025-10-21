@@ -10,7 +10,8 @@
     "prisma:generate:products": "prisma generate --schema apps/products-service/prisma/schema.prisma",
     "prisma:migrate:products": "prisma migrate dev --schema apps/products-service/prisma/schema.prisma",
     "prisma:studio:products": "prisma studio --schema apps/products-service/prisma/schema.prisma",
-    "postinstall": "npm run prisma:generate:orders && npm run prisma:generate:products"
+    "postinstall": "npm run prisma:generate:orders && npm run prisma:generate:products",
+    "seed:products": "ts-node apps/products-service/prisma/seed.ts"
   },
   "private": true,
   "dependencies": {
@@ -23,6 +24,7 @@
     "axios": "^1.11.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "prisma": "^6.15.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0"
   },
