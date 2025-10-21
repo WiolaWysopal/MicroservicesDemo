@@ -18,7 +18,7 @@ enum OrderStatus {
 model Order {
   id           Int          @id @default(autoincrement())
   customerName String
-  totalAmount  Int          // Stored in cents
+  totalAmount  Decimal
   status       OrderStatus  @default(pending)
   items        OrderItem[]
   createdAt    DateTime     @default(now())
@@ -32,7 +32,7 @@ model OrderItem {
   productId   Int
   productName String
   quantity    Int
-  price       Int     // Stored in cents
+  price       Decimal
 
   @@unique([orderId, productId])
 }
