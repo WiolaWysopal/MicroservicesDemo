@@ -101,7 +101,7 @@ export class OrdersService {
   async updateStatus(id: number, status: string): Promise<Order> {
     try {
       this.logger.log(`Updating status of order ${id} to "${status}"`);
-      return await this.prisma.order.update({
+      const updatedOrder = await this.prisma.order.update({
         where: { id },
         data: { status },
         include: {
@@ -109,6 +109,7 @@ export class OrdersService {
         },
       });
       this.logger.log(`Order ${id} status updated successfully`);
+      return updatedOrder;
     } catch (error: any) {
       this.logger.error(`Failed to update status for order ${id}`, error.stack);
       if (error.code === 'P2025') {
@@ -120,15 +121,17 @@ export class OrdersService {
 
   async delete(id: number): Promise<Order> {
     try {
-      this.logger.log(`Order ${id} status updated successfully`);
-      return await this.prisma.order.delete({
+      this.logger.log(`Deleting order with ID: ${id}`);
+      const deletedOrder = await this.prisma.order.delete({
         where: { id },
         include: {
           items: true,
         },
       });
+      this.logger.log(`Order ${id} deleted successfully`);
+      return deletedOrder;
     } catch (error: any) {
-      this.logger.error(`Failed to update status for order ${id}`, error.stack);
+      this.logger.error(`Failed to delete order ${id}`, error.stack);
       if (error.code === 'P2025') {
         throw new BadRequestException(`Order with ID ${id} not found`);
       }

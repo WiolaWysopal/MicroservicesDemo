@@ -14,21 +14,30 @@ export class ProductsService {
   }
 
   async findOne(id: number): Promise<Product> {
+    this.logger.log(`Fetching product with ID: ${id}`);
     const product = await this.prisma.product.findUnique({ where: { id } });
     if (!product) {
+      this.logger.warn(`Product with ID ${id} not found`);
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
     return product;
   }
 
   async create(data: Prisma.ProductCreateInput): Promise<Product> {
-    return this.prisma.product.create({ data });
+    this.logger.log(`Creating new product: ${data.name}`);
+    const product = await this.prisma.product.create({ data });
+    this.logger.log(`Product created successfully with ID: ${product.id}`);
+    return product;
   }
 
   async update(id: number, data: Prisma.ProductUpdateInput): Promise<Product> {
     try {
-      return await this.prisma.product.update({ where: { id }, data });
+      this.logger.log(`Updating product with ID: ${id}`);
+      const updatedProduct = await this.prisma.product.update({ where: { id }, data });
+      this.logger.log(`Product ${id} updated successfully`);
+      return updatedProduct;
     } catch (error:any) {
+      this.logger.error(`Failed to update product ${id}`, error.stack);
       if (error.code === 'P2025') {
         throw new NotFoundException(`Product with ID ${id} not found`);
       }
@@ -38,8 +47,12 @@ export class ProductsService {
 
   async delete(id: number): Promise<Product> {
     try {
-      return await this.prisma.product.delete({ where: { id } });
+      this.logger.log(`Deleting product with ID: ${id}`);
+      const deletedProduct = await this.prisma.product.delete({ where: { id } });
+      this.logger.log(`Product ${id} deleted successfully`);
+      return deletedProduct;
     } catch (error : any) {
+      this.logger.error(`Failed to delete product ${id}`, error.stack);
       if (error.code === 'P2025') {
         throw new NotFoundException(`Product with ID ${id} not found`);
       }
@@ -49,24 +62,30 @@ export class ProductsService {
 
   async checkAvailability(id: number, requestedQuantity: number): Promise<boolean> {
     const product = await this.findOne(id);
+    this.logger.debug(`Checking availability for product ${id}, requested: ${requestedQuantity}, available: ${product.quantity}`);
     return product.quantity >= requestedQuantity;
   }
 
   async decreaseQuantity(id: number, quantity: number): Promise<Product> {
+    this.logger.log(`Decreasing quantity for product ${id} by ${quantity}`);
     const product = await this.findOne(id);
 
     if (product.quantity < quantity) {
+      this.logger.warn(`Insufficient quantity for product ${id}. Available: ${product.quantity}, requested: ${quantity}`);
       throw new BadRequestException('Insufficient quantity');
     }
 
-    return this.prisma.product.update({
+    const updatedProduct = await this.prisma.product.update({
       where: { id },
       data: { quantity: { decrement: quantity } },
     });
+    this.logger.log(`Product ${id} quantity decreased by ${quantity}`);
+    return updatedProduct;
   }
 
   // HEALTH FUNCTION
   async getHealthProducts(): Promise<{ service: string; status: string; timestamp: string }> {
+    this.logger.log('Checking health of products-service');
     try {
       await this.prisma.product.findMany({ take: 1 }); // prosty test bazy
       return {
@@ -75,6 +94,7 @@ export class ProductsService {
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
+      this.logger.error('Health check failed for products-service', error);
       return {
         service: 'products-service',
         status: 'error',
