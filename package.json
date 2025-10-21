@@ -4,17 +4,13 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio",
     "prisma:generate:orders": "prisma generate --schema apps/orders-service/prisma/schema.prisma",
     "prisma:migrate:orders": "prisma migrate dev --schema apps/orders-service/prisma/schema.prisma",
     "prisma:studio:orders": "prisma studio --schema apps/orders-service/prisma/schema.prisma",
     "prisma:generate:products": "prisma generate --schema apps/products-service/prisma/schema.prisma",
     "prisma:migrate:products": "prisma migrate dev --schema apps/products-service/prisma/schema.prisma",
     "prisma:studio:products": "prisma studio --schema apps/products-service/prisma/schema.prisma",
-    "db:push": "prisma db push",
-    "postinstall": "prisma generate"
+    "postinstall": "npm run prisma:generate:orders && npm run prisma:generate:products"
   },
   "private": true,
   "dependencies": {
