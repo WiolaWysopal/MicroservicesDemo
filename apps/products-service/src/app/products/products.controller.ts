@@ -1,55 +1,61 @@
-// src/products/products.controller.ts
-import { Controller, Get, Post, Put, Param, Body, HttpCode, HttpStatus, Patch, ParseIntPipe } from '@nestjs/common';
+// apps/products-service/src/app/products/products.controller.ts
+import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { Product } from '@prisma/client';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { Product, Prisma } from '@prisma/client';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  findAll(): Promise<Product[]> {
+  async findAll(): Promise<Product[]> {
     return this.productsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Product> {
-    return this.productsService.findOne(id);
+  async findOne(@Param('id') id: string): Promise<Product> {
+    return this.productsService.findOne(parseInt(id));
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createProductDto: CreateProductDto): Promise<Product> {
-    return this.productsService.create(createProductDto);
+  async create(@Body() productData: Prisma.ProductCreateInput): Promise<Product> {
+    return this.productsService.create(productData);
   }
 
   @Put(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateProductDto: UpdateProductDto,
+  async update(
+    @Param('id') id: string,
+    @Body() productData: Prisma.ProductUpdateInput
   ): Promise<Product> {
-    return this.productsService.update(id, updateProductDto);
+    return this.productsService.update(parseInt(id), productData);
   }
 
-  // Endpoint dla sprawdzenia dostępności
+  @Delete(':id')
+  async delete(@Param('id') id: string): Promise<Product> {
+    return this.productsService.delete(parseInt(id));
+  }
+
   @Get(':id/availability/:quantity')
-  checkAvailability(
-    @Param('id', ParseIntPipe) id: number,
-    @Param('quantity', ParseIntPipe) quantity: number,
+  async checkAvailability(
+    @Param('id') id: string,
+    @Param('quantity') quantity: string
   ): Promise<{ available: boolean }> {
-    return this.productsService
-      .checkAvailability(id, quantity)
-      .then((available) => ({ available }));
+    const available = await this.productsService.checkAvailability(
+      parseInt(id),
+      parseInt(quantity)
+    );
+    return { available };
   }
 
-  // Endpoint do zmniejszania ilości na magazynie
-  @Patch(':id/decrease')
-  decreaseQuantity(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() body: { quantity: number },
+  @Post(':id/decrease-quantity/:quantity')
+  async decreaseQuantity(
+    @Param('id') id: string,
+    @Param('quantity') quantity: string
   ): Promise<Product> {
-    return this.productsService.decreaseQuantity(id, body.quantity);
+    return this.productsService.decreaseQuantity(
+      parseInt(id),
+      parseInt(quantity)
+    );
   }
 }
