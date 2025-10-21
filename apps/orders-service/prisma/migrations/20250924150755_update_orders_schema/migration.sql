@@ -2,7 +2,7 @@
 CREATE TABLE "Order" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "customerName" TEXT NOT NULL,
-    "totalAmount" INTEGER NOT NULL,
+    "totalAmount" DECIMAL NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'pending',
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL
@@ -15,7 +15,7 @@ CREATE TABLE "OrderItem" (
     "productId" INTEGER NOT NULL,
     "productName" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
-    "price" INTEGER NOT NULL,
+    "price" DECIMAL NOT NULL,
     CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 

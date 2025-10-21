@@ -1,5 +1,5 @@
 // apps/products-service/src/app/products/products.controller.ts
-import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import {Controller, Get, Post, Put, Delete, Param, Body, HttpCode, HttpStatus, ParseIntPipe} from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Product, Prisma } from '@prisma/client';
 
@@ -13,8 +13,9 @@ export class ProductsController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Product> {
-    return this.productsService.findOne(parseInt(id));
+  async findOne(    @Param('id', ParseIntPipe) id: number,
+                ): Promise<Product> {
+    return this.productsService.findOne(id);
   }
 
   @Post()
@@ -25,37 +26,37 @@ export class ProductsController {
 
   @Put(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() productData: Prisma.ProductUpdateInput
   ): Promise<Product> {
-    return this.productsService.update(parseInt(id), productData);
+    return this.productsService.update(id, productData);
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string): Promise<Product> {
-    return this.productsService.delete(parseInt(id));
+  async delete(@Param('id', ParseIntPipe) id: number): Promise<Product> {
+    return this.productsService.delete(id);
   }
 
   @Get(':id/availability/:quantity')
   async checkAvailability(
-    @Param('id') id: string,
-    @Param('quantity') quantity: string
+    @Param('id', ParseIntPipe) id: number,
+    @Param('quantity', ParseIntPipe) quantity: number,
   ): Promise<{ available: boolean }> {
     const available = await this.productsService.checkAvailability(
-      parseInt(id),
-      parseInt(quantity)
+      id,
+      quantity
     );
     return { available };
   }
 
   @Post(':id/decrease-quantity/:quantity')
   async decreaseQuantity(
-    @Param('id') id: string,
-    @Param('quantity') quantity: string
+    @Param('id', ParseIntPipe) id: number,
+    @Param('quantity', ParseIntPipe) quantity: number,
   ): Promise<Product> {
     return this.productsService.decreaseQuantity(
-      parseInt(id),
-      parseInt(quantity)
+      id,
+      quantity
     );
   }
 }
