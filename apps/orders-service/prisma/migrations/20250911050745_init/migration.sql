@@ -2,7 +2,7 @@
 CREATE TABLE "Order" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "customerName" TEXT NOT NULL,
-    "totalAmount" REAL NOT NULL,
+    "totalAmount" INTEGER NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'pending',
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL
@@ -15,6 +15,9 @@ CREATE TABLE "OrderItem" (
     "productId" INTEGER NOT NULL,
     "productName" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
-    "price" REAL NOT NULL,
-    CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "price" INTEGER NOT NULL,
+    CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "OrderItem_orderId_productId_key" ON "OrderItem"("orderId", "productId");
