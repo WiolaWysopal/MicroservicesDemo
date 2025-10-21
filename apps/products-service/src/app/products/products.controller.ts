@@ -7,6 +7,12 @@ import { Product, Prisma } from '@prisma/client';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  // HEALTH ENDPOINT
+  @Get('/health')
+  async getHealth(): Promise<{ service: string; status: string; timestamp: string }> {
+    return this.productsService.getHealthProducts();
+  }
+
   @Get()
   async findAll(): Promise<Product[]> {
     return this.productsService.findAll();

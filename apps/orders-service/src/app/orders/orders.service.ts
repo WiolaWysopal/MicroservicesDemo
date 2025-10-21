@@ -122,4 +122,13 @@ export class OrdersService {
       throw error;
     }
   }
+
+  // HEALTH FUNCTION
+  async getHealthService(): Promise<{ service: string; status: string; timestamp: string }> {
+  return {
+    service: 'orders-service',
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+  };
+}
 }

@@ -4,6 +4,7 @@ import { Product, Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductsService {
+  productsClient: any;
   constructor(private prisma: PrismaService) {}
 
   async findAll(): Promise<Product[]> {
@@ -60,5 +61,23 @@ export class ProductsService {
       where: { id },
       data: { quantity: { decrement: quantity } },
     });
+  }
+
+  // HEALTH FUNCTION
+  async getHealthProducts(): Promise<{ service: string; status: string; timestamp: string }> {
+    try {
+      await this.prisma.product.findMany({ take: 1 }); // prosty test bazy
+      return {
+        service: 'products-service',
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        service: 'products-service',
+        status: 'error',
+        timestamp: new Date().toISOString(),
+      };
+    }
   }
 }
