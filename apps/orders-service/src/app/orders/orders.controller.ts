@@ -8,6 +8,12 @@ import { Order } from './order.entity';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  // HEALTH ENDPOINT
+  @Get('/health')
+  async getHealth(): Promise<{ service: string; status: string; timestamp: string }> {
+    return this.ordersService.getHealthService();
+  }
+
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
@@ -15,20 +21,20 @@ export class OrdersController {
   }
 
   @Get()
-  findAll(): Order[] {
+  async findAll(): Promise<Order[]> {
     return this.ordersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Order {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Order> {
     return this.ordersService.findOne(id);
   }
 
   @Patch(':id/status')
-  updateStatus(
+  async updateStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateOrderStatusDto
-  ): Order {
+  ): Promise<Order> {
     return this.ordersService.updateStatus(id, dto.status);
   }
 }

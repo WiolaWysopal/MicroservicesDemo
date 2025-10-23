@@ -60,3 +60,6 @@ apps/**/prisma/*.db
 apps/*/prisma/
 # ignoruj wszystkie pliki .db
 *.db
+
+.env
+*.db

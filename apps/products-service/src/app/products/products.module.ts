@@ -1,12 +1,13 @@
+// apps/products-service/src/app/products/products.module.ts
 import { Module } from '@nestjs/common';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
 import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
-  imports: [PrismaModule], // <-- WAŻNE
+  imports: [PrismaModule],
   controllers: [ProductsController],
   providers: [ProductsService],
-  exports: [ProductsService], // Ważne dla przyszłej integracji!
+  exports: [ProductsService],
 })
 export class ProductsModule {}

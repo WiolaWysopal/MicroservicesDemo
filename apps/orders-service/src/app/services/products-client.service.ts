@@ -43,4 +43,18 @@ export class ProductsClientService {
       HttpStatus.SERVICE_UNAVAILABLE
     );
   }
+
+  async decreaseQuantity(productId: number, quantity: number): Promise<void> {
+    try {
+      await firstValueFrom(
+        this.httpService.post(`${this.productsServiceUrl}/products/${productId}/decrease-quantity/${quantity}`)
+      );
+    } catch (error) {
+      this.handleError(error as AxiosError);
+    }
+  }
+
+  getHealth() {
+    throw new Error('Method not implemented.');
+  }
 }

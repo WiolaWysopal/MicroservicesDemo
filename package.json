@@ -4,26 +4,27 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio",
+    "prisma:generate:orders": "prisma generate --schema apps/orders-service/prisma/schema.prisma",
+    "prisma:migrate:orders": "prisma migrate dev --schema apps/orders-service/prisma/schema.prisma",
+    "prisma:studio:orders": "prisma studio --schema apps/orders-service/prisma/schema.prisma",
+    "prisma:generate:products": "prisma generate --schema apps/products-service/prisma/schema.prisma",
     "prisma:migrate:products": "prisma migrate dev --schema apps/products-service/prisma/schema.prisma",
-    "db:push": "prisma db push",
-    "postinstall": "prisma generate"
-  },
-  "prisma": {
-    "schema": "apps/products-service/prisma/schema.prisma"
+    "prisma:studio:products": "prisma studio --schema apps/products-service/prisma/schema.prisma",
+    "postinstall": "npm run prisma:generate:orders && npm run prisma:generate:products",
+    "seed:products": "ts-node apps/products-service/prisma/seed.ts"
   },
   "private": true,
   "dependencies": {
     "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
+    "@nestjs/mapped-types": "^2.1.0",
     "@nestjs/platform-express": "^11.0.0",
     "@prisma/client": "^6.15.0",
     "axios": "^1.11.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "prisma": "^6.15.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0"
   },
@@ -56,11 +57,7 @@
     "webpack-cli": "^5.1.4"
   },
   "workspaces": [
-    "apps/*",
-    "orders-service",
-    "orders-service-e2e",
-    "shared-interfaces",
-    "orders-service-e2e",
-    "shared"
+  "apps/*",
+  "libs/*"
   ]
 }
