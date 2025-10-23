@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  products-service:
+    build:
+      context: .
+      dockerfile: ./apps/products-service/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "file:/app/prisma/products.db"
+
+  orders-service:
+    build:
+      context: .
+      dockerfile: ./apps/orders-service/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: "file:/app/prisma/orders.db"

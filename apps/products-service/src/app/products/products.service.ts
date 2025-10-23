@@ -37,33 +37,25 @@ export class ProductsService {
     }
   }
 
-  async findAll(): Promise<Product[]> {
-    return this.prisma.product.findMany();
-  }
-
   async findOne(id: number): Promise<Product> {
     this.validateId(id);
     const product = await this.prisma.product.findUnique({ where: { id } });
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
-    
     return product;
   }
 
   async create(data: Prisma.ProductCreateInput): Promise<Product> {
-    return this.prisma.product.create({
-      data,
-    });
+    return this.prisma.product.create({ data });
   }
 
   async update(id: number, data: Prisma.ProductUpdateInput): Promise<Product> {
     this.validateId(id);
     this.validateData(data);
-
     try {
       return await this.prisma.product.update({ where: { id }, data });
-    } catch (error:any) {
+    } catch (error: any) {
       if (error.code === 'P2025') {
         throw new NotFoundException(`Product with ID ${id} not found`);
       }
@@ -72,15 +64,10 @@ export class ProductsService {
   }
 
   async delete(id: number): Promise<Product> {
-    try {
-      return await this.prisma.product.delete({
-        where: { id },
-      });
-    } catch (error) {
     this.validateId(id);
     try {
       return await this.prisma.product.delete({ where: { id } });
-    } catch (error : any) {
+    } catch (error: any) {
       if (error.code === 'P2025') {
         throw new NotFoundException(`Product with ID ${id} not found`);
       }
@@ -96,7 +83,6 @@ export class ProductsService {
   }
 
   async decreaseQuantity(id: number, quantity: number): Promise<Product> {
-    const product = await this.findOne(id);
     this.validateId(id);
     this.validateQuantity(quantity);
 
@@ -105,14 +91,6 @@ export class ProductsService {
     if (product.quantity < quantity) {
       throw new BadRequestException('Insufficient quantity');
     }
-    
-    return this.prisma.product.update({
-      where: { id },
-      data: {
-        quantity: {
-          decrement: quantity,
-        },
-      },
 
     return this.prisma.product.update({
       where: { id },
