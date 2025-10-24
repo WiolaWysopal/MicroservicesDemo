@@ -1,40 +1,31 @@
-# Stage 1: build
-FROM node:18-alpine AS builder
-RUN apk add --no-cache bash libc6-compat git python3 make g++ openssl
+# Etap 1: builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Kopiowanie root package.json + lockfile + tsconfig
+RUN apk add --no-cache bash git python3 make g++ libc6-compat openssl
+
 COPY package*.json nx.json tsconfig.base.json ./
 
-# Instalacja TypeScript globalnie
-RUN npm install -g typescript
+RUN npm install --legacy-peer-deps
 
-# Kopiowanie package.json serwisu
-COPY apps/orders-service/package*.json ./apps/orders-service/
-
-# Instalacja wszystkich dependencies (dev + prod)
-RUN npm install --legacy-peer-deps --prefix ./apps/orders-service
-
-# Kopiowanie kodu źródłowego i wspólnych bibliotek Nx
 COPY apps/orders-service ./apps/orders-service
 COPY libs/shared-interfaces ./libs/shared-interfaces
 
-# Kompilacja TypeScript
 WORKDIR /app/apps/orders-service
-RUN tsc
+RUN npx prisma generate
+RUN npx nx build orders-service --prod
 
-# Stage 2: production
-FROM node:18-alpine AS production
+# Etap 2: produkcyjny obraz minimalny
+FROM node:20-alpine AS production
+
 WORKDIR /app
 
-# Kopiowanie całego node_modules z buildera
 COPY --from=builder /app/apps/orders-service/node_modules ./node_modules
-
-# Kopiowanie skompilowanego kodu
 COPY --from=builder /app/apps/orders-service/dist ./dist
 
-ENV PORT=3001
-EXPOSE 3001
+WORKDIR /app/dist
 
-CMD ["node", "dist/main.js"]
+EXPOSE 3002
+
+CMD ["node", "main.js"]

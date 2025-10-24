@@ -1,39 +1,39 @@
-# Stage 1: build
-FROM node:18-alpine AS builder
-RUN apk add --no-cache bash libc6-compat git python3 make g++ openssl
+# Etap 1: builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Kopiowanie root package.json + lockfile + tsconfig
+# Zainstaluj niezbędne narzędzia
+RUN apk add --no-cache bash git python3 make g++ libc6-compat openssl
+
+# Kopiujemy root package.json i nx config
 COPY package*.json nx.json tsconfig.base.json ./
 
-# Instalacja wszystkich dependencies (dev + prod)
+# Instalacja root dependencies (Nx, Prisma)
 RUN npm install --legacy-peer-deps
 
-# Kopiowanie kodu serwisu i Prisma
+# Kopiujemy serwis i shared libs
 COPY apps/products-service ./apps/products-service
-COPY apps/products-service/prisma ./apps/products-service/prisma
+COPY libs/shared-interfaces ./libs/shared-interfaces
 
-# Generowanie Prisma Client
+# Generujemy Prisma Client
 WORKDIR /app/apps/products-service
-RUN npx prisma generate --schema=prisma/schema.prisma
+RUN npx prisma generate
 
-# Kompilacja TypeScript / build Webpack (jeśli używasz Nx build)
+# Budujemy Typescript serwisu
 RUN npx nx build products-service --prod
 
-# Stage 2: production
-FROM node:18-alpine AS production
+# Etap 2: produkcyjny obraz minimalny
+FROM node:20-alpine AS production
+
 WORKDIR /app
 
-# Kopiowanie całego node_modules z root
-COPY --from=builder /app/node_modules ./node_modules
+# Kopiujemy node_modules i build
+COPY --from=builder /app/apps/products-service/node_modules ./node_modules
+COPY --from=builder /app/apps/products-service/dist ./dist
 
-# Kopiowanie skompilowanego kodu
-COPY --from=builder /app/dist/apps/products-service ./dist
+WORKDIR /app/dist
 
-# Kopiowanie Prisma Client
-COPY --from=builder /app/apps/products-service/prisma ./prisma
+EXPOSE 3001
 
-ENV PORT=3000
-EXPOSE 3000
-CMD ["node", "dist/main.js"]
+CMD ["node", "main.js"]

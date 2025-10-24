@@ -1,20 +1,28 @@
-version: "3.9"
+version: '3.9'
 
 services:
   products-service:
     build:
       context: .
-      dockerfile: ./apps/products-service/Dockerfile
+      dockerfile: apps/products-service/Dockerfile
     ports:
-      - "3000:3000"
+      - "3001:3001"
     environment:
-      DATABASE_URL: "file:/app/prisma/products.db"
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/products"
 
   orders-service:
     build:
       context: .
-      dockerfile: ./apps/orders-service/Dockerfile
+      dockerfile: apps/orders-service/Dockerfile
     ports:
-      - "3001:3001"
+      - "3002:3002"
     environment:
-      DATABASE_URL: "file:/app/prisma/orders.db"
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/orders"
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
