@@ -1,4 +1,3 @@
-// apps/orders-service/prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
   output   = "../../../node_modules/@prisma/client/orders"
@@ -16,23 +15,21 @@ enum OrderStatus {
 }
 
 model Order {
-  id           Int          @id @default(autoincrement())
+  id           Int         @id @default(autoincrement())
   customerName String
-  totalAmount  Decimal
+  totalAmount  Float
   status       OrderStatus  @default(pending)
-  items        OrderItem[]
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+  items        OrderItem[]
 }
 
 model OrderItem {
-  id          Int     @id @default(autoincrement())
-  orderId     Int
-  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId   Int
+  id         Int     @id @default(autoincrement())
+  order      Order   @relation(fields: [orderId], references: [id])
+  orderId    Int
+  productId  Int
   productName String
-  quantity    Int
-  price       Decimal
-
-  @@unique([orderId, productId])
+  quantity   Int
+  price      Float
 }

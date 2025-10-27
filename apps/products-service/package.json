@@ -82,5 +82,10 @@
       }
     }
   },
-  "dependencies": {}
+  "dependencies": {
+    "@prisma/client": "^6.18.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.18.0"
+  }
 }
