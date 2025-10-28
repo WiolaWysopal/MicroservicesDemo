@@ -1,16 +1,19 @@
-// src/products/dto/create-product.dto.ts
-import { IsString, IsNotEmpty, IsNumber, Min, IsInt } from 'class-validator';
+// apps/products-service/src/app/products/dto/create-product.dto.ts
+import { IsString, IsNumber, IsOptional, Min } from 'class-validator';
 
 export class CreateProductDto {
-  @IsNotEmpty({ message: 'Product name is required' })
   @IsString()
   name!: string;
 
   @IsNumber()
-  @Min(0, { message: 'Price must be a non-negative number' })
+  @Min(0)
   price!: number;
 
-  @IsInt()
-  @Min(0, { message: 'Quantity must be a non-negative integer' })
+  @IsNumber()
+  @Min(0)
   quantity!: number;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
 }
