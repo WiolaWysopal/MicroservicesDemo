@@ -13,64 +13,72 @@ export class OrdersService {
     private readonly productsClient: ProductsClientService
   ) {}
 
-  async create(createOrderDto: CreateOrderDto): Promise<Order> {
-    this.logger.log(`Creating new order for customer: ${createOrderDto.customerName}`);
-    const orderItems: Prisma.OrderItemCreateWithoutOrderInput[] = [];
-    let totalAmount = 0;
+async create(createOrderDto: CreateOrderDto): Promise<Order> {
+  this.logger.log(`Creating new order (transaction) for customer: ${createOrderDto.customerName}`);
 
-    // Walidacja i pobranie informacji o produktach
-    for (const item of createOrderDto.items) {
-      // Sprawdź czy produkt istnieje
-      const product = await this.productsClient.getProduct(item.productId);
-      this.logger.debug(`Fetched product ${product.name} with ID ${item.productId}`);
+  return await this.prisma.$transaction(async (tx) => {
+    try {
+      this.logger.log('🚀 Starting transaction...');
 
-      // Sprawdź dostępność
-      const isAvailable = await this.productsClient.checkProductAvailability(
-        item.productId,
-        item.quantity
-      );
+      const orderItems: Prisma.OrderItemCreateWithoutOrderInput[] = [];
+      let totalAmount = 0;
 
-      if (!isAvailable) {
-        this.logger.warn(`Product ${product.name} not available in requested quantity`);
-        throw new BadRequestException(
-          `Product ${product.name} is not available in requested quantity`
+      // 1️⃣ Walidacja produktów i obliczanie sumy
+      for (const item of createOrderDto.items) {
+        const product = await this.productsClient.getProduct(item.productId);
+        this.logger.debug(`Fetched product ${product.name} with ID ${item.productId}`);
+
+        const isAvailable = await this.productsClient.checkProductAvailability(
+          item.productId,
+          item.quantity
         );
+
+        if (!isAvailable) {
+          this.logger.warn(`Product ${product.name} not available in requested quantity`);
+          throw new BadRequestException(
+            `Product ${product.name} is not available in requested quantity`
+          );
+        }
+
+        orderItems.push({
+          productId: item.productId,
+          productName: product.name,
+          quantity: item.quantity,
+          price: product.price,
+        });
+
+        totalAmount += product.price * item.quantity;
       }
 
-      // Przygotuj pozycję zamówienia
-      orderItems.push({
-        productId: item.productId,
-        productName: product.name,
-        quantity: item.quantity,
-        price: product.price,
+      // 2️⃣ Tworzenie zamówienia i jego pozycji w ramach transakcji
+      const order = await tx.order.create({
+        data: {
+          customerName: createOrderDto.customerName,
+          totalAmount,
+          status: 'confirmed',
+          items: {
+            create: orderItems,
+          },
+        },
+        include: {
+          items: true,
+        },
       });
 
-      totalAmount += product.price * item.quantity;
+      // 3️⃣ Aktualizacja stanów magazynowych produktów
+      for (const item of createOrderDto.items) {
+        await this.productsClient.decreaseQuantity(item.productId, item.quantity);
+      }
+
+      this.logger.log(`✅ Transaction committed successfully. Order ID: ${order.id}`);
+      return order;
+    } catch (error) {
+      this.logger.error('❌ Transaction failed, rolling back...', error.stack);
+      throw error; // rollback następuje automatycznie przy wyjątku
     }
+  });
+}
 
-    // Utwórz zamówienie w bazie danych
-    const order = await this.prisma.order.create({
-      data: {
-        customerName: createOrderDto.customerName,
-        totalAmount,
-        status: 'confirmed',
-        items: {
-          create: orderItems,
-        },
-      },
-      include: {
-        items: true,
-      },
-    });
-    this.logger.log(`Order created successfully with ID: ${order.id}`);
-
-    // Zmniejsz stan magazynowy produktów
-    for (const item of createOrderDto.items) {
-       await this.productsClient.decreaseQuantity(item.productId, item.quantity);
-     }
-
-    return order;
-  }
 
   async findAll(): Promise<Order[]> {
     this.logger.log('Fetching all orders');
